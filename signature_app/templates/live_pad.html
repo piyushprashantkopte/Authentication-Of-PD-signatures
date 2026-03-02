@@ -16,7 +16,7 @@
 <body>
     <div class="card">
         <h2>Verify Signature</h2>
-        <form method="post" action="{% url 'authenticate' %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'authenticate_file' %}" enctype="multipart/form-data">
             {% csrf_token %}
             
             <label>Who are you?</label>
