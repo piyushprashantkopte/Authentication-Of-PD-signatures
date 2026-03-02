@@ -2,4 +2,7 @@ echo "ml_models/pd_authenticator.pkl" >> .gitignore
 # Or add the entire ml_models folder if all files are large:
 # echo "ml_models/" >> .gitignore"ml_models/pd_authenticator.pkl" 
 "*.pkl" 
-echo "ml_models/signature_cnn_model.h5" >> .gitignore
+echo "ml_models/signature_cnn_model.h5" >> .gitignore"ml_models/pd_authenticator.pkl" 
+"ml_models/signature_cnn_model.h5" 
+"ml_models/*.pkl" 
+"ml_models/*.h5" 
