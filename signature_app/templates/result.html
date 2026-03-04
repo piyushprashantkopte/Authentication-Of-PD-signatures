@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication Result</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-card {
@@ -24,34 +24,36 @@
     <div class="max-w-6xl w-full flex flex-col md:flex-row gap-8 justify-center items-stretch">
         
         <div class="glass-card flex-1 min-w-[320px] max-w-[500px] rounded-[2.5rem] shadow-2xl overflow-hidden border-t-[12px]" style="border-color: {{ color }};">
-            <div class="p-8 flex flex-col h-full">
-                <div class="text-center mb-8">
-                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Security Verification</span>
-                    <h2 class="text-3xl font-extrabold mt-2" style="color: {{ color }};">Authenticated</h2>
+            <div class="p-8 flex flex-col h-full text-center">
+                <div class="mb-8">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">System Verdict</span>
+                    <h2 class="text-4xl font-black mt-2" style="color: {{ color }};">
+                        {% if color == 'green' %}Authenticated{% else %}Denied{% endif %}
+                    </h2>
                 </div>
                 
                 <div class="flex gap-4 mb-8">
-                    <div class="flex-1 bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
+                    <div class="flex-1 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Uploaded</h4>
                         <div class="bg-white p-2 rounded-lg shadow-sm">
                             <img src="data:image/png;base64,{{ input_img }}" alt="Input" class="w-full h-auto rounded border-b-2 border-slate-100" />
                         </div>
                     </div>
 
-                    <div class="flex-1 bg-slate-50 p-3 rounded-2xl border border-slate-100 text-center">
+                    <div class="flex-1 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Reference ({{ claimed_id }})</h4>
                         <div class="bg-white p-2 rounded-lg shadow-sm flex items-center justify-center min-h-[80px]">
                             {% if ref_img %}
                             <img src="data:image/png;base64,{{ ref_img }}" alt="Reference" class="w-full h-auto rounded border-b-2 border-slate-100" />
                             {% else %}
-                            <span class="text-[10px] text-slate-300 italic">No reference</span>
+                            <span class="text-[10px] text-slate-300 italic px-2">No reference available</span>
                             {% endif %}
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-2 mb-8 text-center">
-                    <p class="text-slate-700 text-lg">Result for <span class="font-bold text-slate-900">{{ identified_user }}</span></p>
+                <div class="space-y-2 mb-8">
+                    <p class="text-slate-700 text-lg italic">Result for <span class="font-bold text-slate-900">{{ identified_user }}</span></p>
                     <p class="text-slate-500 text-sm leading-relaxed px-4">{{ message }}</p>
                 </div>
 
@@ -64,26 +66,26 @@
         </div>
 
         <div class="glass-card flex-1 min-w-[320px] max-w-[500px] rounded-[2.5rem] shadow-2xl overflow-hidden border-[3px] border-t-[12px]" style="border-color: {{ color }};">
-            <div class="p-8 flex flex-col h-full items-center">
-                <div class="text-center mb-4">
+            <div class="p-8 flex flex-col h-full items-center text-center">
+                <div class="mb-4">
                     <span class="text-xs font-bold uppercase tracking-widest text-slate-400">CNN Model Analysis</span>
-                    <h2 class="text-xl font-bold text-slate-800 mt-2">Identification Confidence</h2>
+                    <h2 class="text-xl font-bold text-slate-800 mt-2">Analysis Score</h2>
                 </div>
 
-                <div class="my-8 text-center">
+                <div class="my-8">
                     <div class="text-7xl font-black tracking-tighter text-slate-900">
                         {{ confidence }}
                     </div>
                     <div class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Match Certainty</div>
                 </div>
 
-                <div class="w-full space-y-4 mb-8">
+                <div class="w-full space-y-4 mb-8 px-4">
                     <div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden p-1 shadow-inner">
                         <div class="h-full rounded-full transition-all duration-1000 ease-out shadow-sm" 
                              style="width: {{ confidence }}; background-color: {{ color }};"></div>
                     </div>
-                    <p class="text-[11px] text-center text-slate-400 italic px-6">
-                        Verified via Convolutional Neural Network Parkinson's Tremor Pattern Analysis.
+                    <p class="text-[11px] text-slate-400 italic leading-tight">
+                        Verified via CNN Parkinson's Tremor Pattern Analysis.
                     </p>
                 </div>
 
