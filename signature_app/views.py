@@ -8,9 +8,10 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .utils import extract_from_file, calculate_14_features, generate_signature_plot, get_reference_signature
 import tensorflow as tf
-from django.shortcuts import render
 from django.conf import settings
 from PIL import Image
+from django.core.files.base import ContentFile
+import base64
 
 # ==========================================
 # 1. MODEL LOADING

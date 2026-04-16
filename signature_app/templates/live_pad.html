@@ -2,35 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PD Signature Auth</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f4f7f6; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; }
-        h2 { color: #333; margin-top: 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #666; }
-        select, input, button { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Auth - Live Pad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="card">
-        <h2>Verify Signature</h2>
-        <form method="post" action="{% url 'authenticate_file' %}" enctype="multipart/form-data">
-            {% csrf_token %}
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-2xl w-full">
+        <a href="{% url 'index_hub' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 mb-6 group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-100">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Live <span class="text-blue-600">Pad</span></h2>
+                <p class="text-slate-500 text-sm">Draw your signature below for CNN pattern analysis.</p>
+            </div>
+
+            <div class="relative bg-slate-50 rounded-3xl border-2 border-slate-200 overflow-hidden mb-8 h-80 shadow-inner">
+                <canvas id="signature-pad" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
+            </div>
+
+            <form action="{% url 'authenticate_image' %}" method="post" enctype="multipart/form-data" id="auth-form">
+                {% csrf_token %}
+                
+                <input type="file" name="signature_image" id="hidden-file-input" class="hidden">
+                
+                <div class="flex gap-4">
+                    <button type="button" onclick="clearPad()" class="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all">
+                        Clear Pad
+                    </button>
+                    <button type="submit" onclick="prepareAndSubmit(event)" class="flex-[2] py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-lg hover:bg-slate-800 transition-all active:scale-[0.98]">
+                        Run CNN Analysis
+                    </button>
+                </div>
+            </form>
             
-            <label>Who are you?</label>
-            <select name="user_id" required>
-                {% for i in user_ids %}
-                    <option value="{{ i }}">User {{ i }}</option>
-                {% endfor %}
-            </select>
-
-            <label>Upload Signature (.txt)</label>
-            <input type="file" name="signature_file" accept=".txt" required>
-
-            <button type="submit">Run Authentication</button>
-        </form>
+            {% if error %}
+            <p class="mt-4 text-red-500 text-center font-medium">{{ error }}</p>
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        // Initialize Canvas
+        function initCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+
+        // Drawing Event Listeners
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX || e.touches[0].clientX) - rect.left,
+                y: (e.clientY || e.touches[0].clientY) - rect.top
+            };
+        };
+
+        const startDrawing = (e) => { isDrawing = true; draw(e); };
+        const stopDrawing = () => { isDrawing = false; ctx.beginPath(); };
+        const draw = (e) => {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        };
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearPad() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // KEY FUNCTION: Converts Canvas to File to satisfy request.FILES
+        function prepareAndSubmit(event) {
+            event.preventDefault();
+            
+            canvas.toBlob((blob) => {
+                const file = new File([blob], "live_signature.png", { type: "image/png" });
+                const container = new DataTransfer();
+                container.items.add(file);
+                
+                const fileInput = document.getElementById('hidden-file-input');
+                fileInput.files = container.files;
+                
+                document.getElementById('auth-form').submit();
+            }, 'image/png');
+        }
+    </script>
 </body>
 </html>
