@@ -24,11 +24,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 RUN mkdir -p /app/ml_models
 
 # Download the 40-class CNN model (95.94% accuracy)
-RUN curl -L -o /app/ml_models/signature_cnn_model.h5 "https://drive.google.com/file/d/1rh1G18CXcOWVFDaNqZxNviTt8CmclqJv/view?usp=sharing"
-
+RUN curl -L -o /app/ml_models/signature_cnn_model.h5 "https://docs.google.com/uc?export=download&id=1rh1G18CXcOWVFDaNqZxNviTt8CmclqJv"
 # Download the Random Forest/XGBoost ensemble model (81.67% accuracy)
-RUN curl -L -o /app/ml_models/pd_authenticator.pkl "https://drive.google.com/file/d/1YciIQQSg22xDtH1h8IaDzhCf0fDFS7AO/view?usp=sharing"
-
+RUN curl -L -o /app/ml_models/pd_authenticator.pkl "https://docs.google.com/uc?export=download&id=1YciIQQSg22xDtH1h8IaDzhCf0fDFS7AO"
 # Copy the rest of your Django project files into the container
 COPY . /app/
 
